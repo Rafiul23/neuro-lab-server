@@ -37,7 +37,22 @@ async function run() {
     await client.db("admin").command({ ping: 1 });
     console.log("Pinged your deployment. You successfully connected to MongoDB!");
 
-    
+
+    const featuredCollection = client.db('labDB').collection('featured');
+    const allTestCollection = client.db('labDB').collection('alltests')
+
+
+    app.get('/featured', async(req, res)=>{
+      const cursor = featuredCollection.find();
+      const result = await cursor.toArray();
+      res.send(result);
+    })
+
+    app.get('/alltests', async(req, res)=>{
+      const cursor = allTestCollection.find();
+      const result = await cursor.toArray();
+      res.send(result);
+    })
 
 
 
