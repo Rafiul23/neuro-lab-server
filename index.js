@@ -39,7 +39,8 @@ async function run() {
 
 
     const featuredCollection = client.db('labDB').collection('featured');
-    const allTestCollection = client.db('labDB').collection('alltests')
+    const allTestCollection = client.db('labDB').collection('alltests');
+    const userCollection = client.db('labDB').collection('users');
 
 
     app.get('/featured', async(req, res)=>{
@@ -61,6 +62,19 @@ async function run() {
       res.send(result);
     })
 
+    // user related api
+
+    app.post('/users', async(req, res)=>{
+      
+      const user = req.body;
+      const query = {email: user.email};
+      const isExist = await userCollection.findOne(query);
+      if(isExist){
+        return res.send({message: 'User already exists', insertedId: null});
+      }
+      const result = await userCollection.insertOne(user);
+      res.send(result);
+    })
 
 
 
