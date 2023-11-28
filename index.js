@@ -9,12 +9,12 @@ const port = process.env.PORT || 5000;
 app.use(cors());
 app.use(express.json());
 
-app.get('/', (req, res)=>{
-    res.send('Lab server is running');
+app.get('/', (req, res) => {
+  res.send('Lab server is running');
 })
 
-app.listen(port, ()=>{
-    console.log(`server is running on port: ${port}`);
+app.listen(port, () => {
+  console.log(`server is running on port: ${port}`);
 })
 
 
@@ -43,54 +43,81 @@ async function run() {
     const userCollection = client.db('labDB').collection('users');
 
 
-    app.get('/featured', async(req, res)=>{
+    app.get('/featured', async (req, res) => {
       const cursor = featuredCollection.find();
       const result = await cursor.toArray();
       res.send(result);
     })
 
-    app.get('/alltests', async(req, res)=>{
+    app.get('/alltests', async (req, res) => {
       const cursor = allTestCollection.find();
       const result = await cursor.toArray();
       res.send(result);
     })
 
-    app.get('/alltests/:id', async(req, res)=>{
+    app.get('/alltests/:id', async (req, res) => {
       const id = req.params.id;
-      const query = {_id: new ObjectId(id)};
+      const query = { _id: new ObjectId(id) };
       const result = await allTestCollection.findOne(query);
       res.send(result);
     })
 
     // user related api
 
-    app.post('/users', async(req, res)=>{
-      
+    app.post('/users', async (req, res) => {
+
       const user = req.body;
-      const query = {email: user.email};
+      const query = { email: user.email };
       const isExist = await userCollection.findOne(query);
-      if(isExist){
-        return res.send({message: 'User already exists', insertedId: null});
+      if (isExist) {
+        return res.send({ message: 'User already exists', insertedId: null });
       }
       const result = await userCollection.insertOne(user);
       res.send(result);
     })
 
-    app.get('/users', async(req, res)=>{
+    app.get('/users', async (req, res) => {
       const cursor = userCollection.find();
       const result = await cursor.toArray();
       res.send(result);
     })
 
-    app.patch('/users/admin/:id', async(req, res)=>{
+    // make user admin
+    app.patch('/users/admin/:id', async (req, res) => {
       const id = req.params.id;
-      const filter = {_id: new ObjectId(id)};
+      const filter = { _id: new ObjectId(id) };
       const updatedDoc = {
-         $set: {
+        $set: {
           role: 'admin'
-         }
+        }
       }
       const result = await userCollection.updateOne(filter, updatedDoc);
+      res.send(result);
+    })
+
+    // block a user
+    app.put('/users/block/:id', async (req, res) => {
+      const id = req.params.id;
+      const filter = { _id: new ObjectId(id) };
+      const updatedStatus = {
+        $set: {
+          status: 'blocked'
+        }
+      }
+      const result = await userCollection.updateOne(filter, updatedStatus);
+      res.send(result);
+    })
+
+    // active a user
+    app.put('/users/active/:id', async (req, res) => {
+      const id = req.params.id;
+      const filter = { _id: new ObjectId(id) };
+      const updatedStatus = {
+        $set: {
+          status: 'active'
+        }
+      }
+      const result = await userCollection.updateOne(filter, updatedStatus);
       res.send(result);
     })
 
