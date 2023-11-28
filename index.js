@@ -56,6 +56,13 @@ async function run() {
       res.send(result);
     })
 
+    app.delete('/test/:id', async(req, res)=>{
+      const id = req.params.id;
+      const query = {_id: new ObjectId(id)};
+      const result = await allTestCollection.deleteOne(query);
+      res.send(result);
+    })
+
     app.get('/alltests/:id', async (req, res) => {
       const id = req.params.id;
       const query = { _id: new ObjectId(id) };
@@ -68,6 +75,8 @@ async function run() {
       const result = await allTestCollection.insertOne(test);
       res.send(result);
     })
+
+
 
     // user related api
 
