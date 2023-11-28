@@ -76,6 +76,25 @@ async function run() {
       res.send(result);
     })
 
+    app.put('/test/:id', async(req, res)=>{
+      const test = req.body;
+      const id = req.params.id;
+      const filter = {_id: new ObjectId(id)};
+      const options = { upsert: true };
+      const updatedTest = {
+        $set: {
+          test_name: test.name,
+          image: test.image,
+          slot: test.slot,
+          test_description: test.description,
+          date: test.date,
+          price: test.price
+        }
+      }
+      const result = await allTestCollection.updateOne(filter,updatedTest, options);
+      res.send(result);
+
+    })
 
 
     // user related api
@@ -115,12 +134,13 @@ async function run() {
     app.put('/users/block/:id', async (req, res) => {
       const id = req.params.id;
       const filter = { _id: new ObjectId(id) };
+      const options = { upsert: true };
       const updatedStatus = {
         $set: {
           status: 'blocked'
         }
       }
-      const result = await userCollection.updateOne(filter, updatedStatus);
+      const result = await userCollection.updateOne(filter, updatedStatus, options);
       res.send(result);
     })
 
@@ -128,12 +148,13 @@ async function run() {
     app.put('/users/active/:id', async (req, res) => {
       const id = req.params.id;
       const filter = { _id: new ObjectId(id) };
+      const options = { upsert: true };
       const updatedStatus = {
         $set: {
           status: 'active'
         }
       }
-      const result = await userCollection.updateOne(filter, updatedStatus);
+      const result = await userCollection.updateOne(filter, updatedStatus, options);
       res.send(result);
     })
 
