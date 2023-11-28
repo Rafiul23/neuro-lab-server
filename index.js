@@ -78,20 +78,20 @@ async function run() {
 
     app.put('/test/:id', async(req, res)=>{
       const test = req.body;
+      console.log(test)
       const id = req.params.id;
       const filter = {_id: new ObjectId(id)};
-      const options = { upsert: true };
       const updatedTest = {
         $set: {
-          test_name: test.name,
+          test_name: test.test_name,
           image: test.image,
           slot: test.slot,
-          test_description: test.description,
+          test_description: test.test_description,
           date: test.date,
           price: test.price
         }
       }
-      const result = await allTestCollection.updateOne(filter,updatedTest, options);
+      const result = await allTestCollection.updateOne(filter,updatedTest);
       res.send(result);
 
     })
@@ -134,13 +134,12 @@ async function run() {
     app.put('/users/block/:id', async (req, res) => {
       const id = req.params.id;
       const filter = { _id: new ObjectId(id) };
-      const options = { upsert: true };
       const updatedStatus = {
         $set: {
           status: 'blocked'
         }
       }
-      const result = await userCollection.updateOne(filter, updatedStatus, options);
+      const result = await userCollection.updateOne(filter, updatedStatus);
       res.send(result);
     })
 
@@ -155,6 +154,13 @@ async function run() {
         }
       }
       const result = await userCollection.updateOne(filter, updatedStatus, options);
+      res.send(result);
+    })
+
+    app.get('/users/:email', async(req, res)=>{
+      const email = req.params.email;
+      const query = {email: email};
+      const result = await userCollection.findOne(query);
       res.send(result);
     })
 
