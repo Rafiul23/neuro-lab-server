@@ -43,6 +43,7 @@ async function run() {
     const userCollection = client.db('labDB').collection('users');
 
 
+    // test related api
     app.get('/featured', async (req, res) => {
       const cursor = featuredCollection.find();
       const result = await cursor.toArray();
@@ -59,6 +60,12 @@ async function run() {
       const id = req.params.id;
       const query = { _id: new ObjectId(id) };
       const result = await allTestCollection.findOne(query);
+      res.send(result);
+    })
+
+    app.post('/test', async(req, res)=>{
+      const test = req.body;
+      const result = await allTestCollection.insertOne(test);
       res.send(result);
     })
 
