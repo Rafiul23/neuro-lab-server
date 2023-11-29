@@ -3,6 +3,7 @@ const cors = require('cors');
 const app = express();
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 require('dotenv').config();
+const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY)
 
 const port = process.env.PORT || 5000;
 
@@ -41,6 +42,21 @@ async function run() {
     const featuredCollection = client.db('labDB').collection('featured');
     const allTestCollection = client.db('labDB').collection('alltests');
     const userCollection = client.db('labDB').collection('users');
+    const bannerCollection = client.db('labDB').collection('banners');
+
+
+
+    // banner related api
+    app.post('/banners', async(req, res)=>{
+      const bannerInfo = req.body;
+      const result = await bannerCollection.insertOne(bannerInfo);
+      res.send(result);
+    })
+
+    app.get('/banners', async(req, res)=>{
+      const result = await bannerCollection.find().toArray();
+      res.send(result);
+    })
 
 
     // test related api
@@ -162,6 +178,21 @@ async function run() {
       const query = {email: email};
       const result = await userCollection.findOne(query);
       res.send(result);
+    })
+
+    // payment intent
+    app.post('/create-payment-intent', async(req, res)=>{
+      const {price} = req.body;
+      const amount = parseInt(price * 100);
+      console.log(amount);
+      const paymentIntent = await stripe.paymentIntents.create({
+        amount: amount,
+        currency: 'usd',
+        payment_method_types: ['card']
+      });
+      res.send({
+        clientSecret: paymentIntent.client_secret
+      })
     })
 
 
