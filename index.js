@@ -75,6 +75,13 @@ async function run() {
       res.send(result);
     })
 
+    app.delete('/banner/:id', async(req, res)=>{
+      const id = req.params.id;
+      const query = {_id: new ObjectId(id)};
+      const result = await bannerCollection.deleteOne(query);
+      res.send(result);
+    })
+
     app.get('/banners', async (req, res) => {
       const result = await bannerCollection.find().toArray();
       res.send(result);
