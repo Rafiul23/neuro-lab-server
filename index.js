@@ -43,17 +43,39 @@ async function run() {
     const allTestCollection = client.db('labDB').collection('alltests');
     const userCollection = client.db('labDB').collection('users');
     const bannerCollection = client.db('labDB').collection('banners');
+    const appointmentCollection = client.db('labDB').collection('appointments');
 
+
+    // appointments related api
+    app.post('/appointment', async (req, res) => {
+      const appointment = req.body;
+      const result = await appointmentCollection.insertOne(appointment);
+      res.send(result);
+    })
+
+    app.get('/appointments/:email', async (req, res) => {
+      const email = req.params.email;
+      const query = { email: email };
+      const result = await appointmentCollection.find(query).toArray();
+      res.send(result);
+    })
+
+    app.delete('/appointment/:id', async(req, res)=>{
+      const id = req.params.id;
+      const query = {_id: new ObjectId(id)};
+      const result = await appointmentCollection.deleteOne(query);
+      res.send(result);
+    })
 
 
     // banner related api
-    app.post('/banners', async(req, res)=>{
+    app.post('/banners', async (req, res) => {
       const bannerInfo = req.body;
       const result = await bannerCollection.insertOne(bannerInfo);
       res.send(result);
     })
 
-    app.get('/banners', async(req, res)=>{
+    app.get('/banners', async (req, res) => {
       const result = await bannerCollection.find().toArray();
       res.send(result);
     })
@@ -72,9 +94,9 @@ async function run() {
       res.send(result);
     })
 
-    app.delete('/test/:id', async(req, res)=>{
+    app.delete('/test/:id', async (req, res) => {
       const id = req.params.id;
-      const query = {_id: new ObjectId(id)};
+      const query = { _id: new ObjectId(id) };
       const result = await allTestCollection.deleteOne(query);
       res.send(result);
     })
@@ -86,17 +108,17 @@ async function run() {
       res.send(result);
     })
 
-    app.post('/test', async(req, res)=>{
+    app.post('/test', async (req, res) => {
       const test = req.body;
       const result = await allTestCollection.insertOne(test);
       res.send(result);
     })
 
-    app.put('/test/:id', async(req, res)=>{
+    app.put('/test/:id', async (req, res) => {
       const test = req.body;
       console.log(test)
       const id = req.params.id;
-      const filter = {_id: new ObjectId(id)};
+      const filter = { _id: new ObjectId(id) };
       const updatedTest = {
         $set: {
           test_name: test.test_name,
@@ -107,7 +129,7 @@ async function run() {
           price: test.price
         }
       }
-      const result = await allTestCollection.updateOne(filter,updatedTest);
+      const result = await allTestCollection.updateOne(filter, updatedTest);
       res.send(result);
 
     })
@@ -173,16 +195,16 @@ async function run() {
       res.send(result);
     })
 
-    app.get('/users/:email', async(req, res)=>{
+    app.get('/users/:email', async (req, res) => {
       const email = req.params.email;
-      const query = {email: email};
+      const query = { email: email };
       const result = await userCollection.findOne(query);
       res.send(result);
     })
 
     // payment intent
-    app.post('/create-payment-intent', async(req, res)=>{
-      const {price} = req.body;
+    app.post('/create-payment-intent', async (req, res) => {
+      const { price } = req.body;
       const amount = parseInt(price * 100);
       console.log(amount);
       const paymentIntent = await stripe.paymentIntents.create({
